@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Lightspeed Register Barcode Catcher
 // @namespace    https://github.com/gmkarl/lightspeedcatchbarcode/
-// @version      0.1
+// @version      0.1.1
 // @description  Handles barcodes entered into the wrong place in the Lightspeed Register.
 // @author       Karl Semich
 // @match        https://*.merchantos.com/register.php*
@@ -35,7 +35,7 @@ function isEAN(digitArray) {
         if ((digitArray.length-i)%2)
             sum += digitArray[i];
         else
-            sum += digitArray[i];
+            sum += digitArray[i] * 3;
     }
     return sum % 10 == 0;
 }
