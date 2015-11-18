@@ -12,15 +12,15 @@
 
 var lastKeys = [];
 
-function isNumeric(var evt) {
+function isNumeric(evt) {
     return evt.charCode >= 48 && evt.charCode <= 57;
 }
 
-function isEnter(var evt) {
+function isEnter(evt) {
     return evt.keyCode == 13;
 }
 
-function toNumeric(var evt) {
+function toNumeric(evt) {
     return evt.charCode - 48;
 }
 
@@ -29,7 +29,7 @@ function isWrongTarget(evt) {
     return element && evt.target && evt.target != element;
 }
 
-function isEAN(var digitArray) {
+function isEAN(digitArray) {
     var sum = 0;
     for (var i = 0; i < digitArray.length; ++i) {
         if ((digitArray.length-i)%2)
@@ -40,11 +40,11 @@ function isEAN(var digitArray) {
     return sum % 10 == 0;
 }
 
-function isBarcode(var digitArray) {
+function isBarcode(digitArray) {
     return (digitArray.length == 8 || digitArray.length == 12 || digitArray.length == 13) && isEAN(digitArray);
 }
 
-function doItemSearch(var string) {
+function doItemSearch(string) {
     window.eval(
         "var element = singleElementById('add_search_item_text');" +
         "element.value = '" + string + "';" +
