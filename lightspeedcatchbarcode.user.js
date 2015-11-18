@@ -5,6 +5,7 @@
 // @description  Handles barcodes entered into the wrong place in the Lightspeed Register.
 // @author       Karl Semich
 // @match        https://*.merchantos.com/register.php*
+// @grant        unsafeWindow
 // ==/UserScript==
 
 (function(){
