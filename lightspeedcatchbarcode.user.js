@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Lightspeed Register Barcode Catcher
 // @namespace    https://github.com/gmkarl/lightspeedcatchbarcode/
-// @version      0.1.2
+// @version      0.1.3
 // @description  Handles barcodes entered into the wrong place in the Lightspeed Register.
 // @author       Karl Semich
 // @match        https://*.merchantos.com/register.php*
@@ -71,6 +71,13 @@ unsafeWindow.onkeypress = cloneInto(function(evt) {
     lastKeys = [];
     return true;
     
+}, unsafeWindow, {cloneFunctions:true});
+
+unsafeWindow.onclick = cloneInto(function(evt) {
+
+    lastKeys = [];
+    return true;
+
 }, unsafeWindow, {cloneFunctions:true});
 
 })();
