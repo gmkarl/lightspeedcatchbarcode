@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Lightspeed Register Barcode Catcher
 // @namespace    https://github.com/gmkarl/lightspeedcatchbarcode/
-// @version      0.1.9
+// @version      0.2.0
 // @description  Handles barcodes entered into the wrong place in the Lightspeed Register.
 // @author       Karl Semich
 // @match        https://*.merchantos.com/register.php*
@@ -81,42 +81,89 @@ function doItemSearch(string) {
 
 unsafeWindow.onkeydown = cloneInto(function(evt) {
 
-    if (isNumeric(evt)) {
-
-        if (lastKeys.length == 0) {
-            initialTarget = evt.target;
-            initialValue = initialTarget.value;
-        }
-
-        lastKeys.push(toNumeric(evt));
-        return true;
-    }
+    try {
+        if (isNumeric(evt)) {
     
-    if (isEnter(evt) && isWrongTarget(evt)) {
-        if (isBarcode(lastKeys)) {
-            console.log("Barcode entered into wrong field.");
-            if (evt.target == initialTarget && initialValue !== undefined ) {
-                console.log("Returning field to original value of '" + initialValue + "'");
-                initialTarget.value = initialValue;
+            if (lastKeys.length == 0) {
+                initialTarget = evt.target;
+                initialValue = initialTarget.value;
             }
-            var barcode = lastKeys.join("");
-            console.log("Performing itemsearch for " + barcode);
-            doItemSearch(barcode);
-            lastKeys = [];
-            return false;
+    
+            lastKeys.push(toNumeric(evt));
+            return true;
         }
-    }
+        
+        if (isEnter(evt) && isWrongTarget(evt)) {
+            if (isBarcode(lastKeys)) {
+                console.log("Barcode entered into wrong field.");
+                if (evt.target == initialTarget && initialValue !== undefined ) {
+                    console.log("Returning field to original value of '" + initialValue + "'");
+                    initialTarget.value = initialValue;
+                }
+                var barcode = lastKeys.join("");
+                console.log("Performing itemsearch for " + barcode);
+                doItemSearch(barcode);
+                lastKeys = [];
+                return false;
+            }
+        }
 
-    lastKeys = [];
+        lastKeys = [];
+    } catch(e) {
+        reportExceptionAsIssue(e, "onkeydown");
+    }
     return true;
     
 }, unsafeWindow, {cloneFunctions:true});
 
 unsafeWindow.onclick = cloneInto(function(evt) {
 
-    lastKeys = [];
+    try {
+        lastKeys = [];
+    } catch(e) {
+        reportExceptionAsIssue(e, "onclick");
+    }
     return true;
 
 }, unsafeWindow, {cloneFunctions:true});
+
+// Submit a github issue about a thrown exception
+var reportExceptionAsIssueRequest;
+//var eventLog = [];
+function reportExceptionAsIssue(error, label) {
+    try {
+        var issueTitle = label + ": " + error.toString();
+        var issueStackTrace = error.stack;
+        //var issueEventLog = eventLog.join("\n")
+        //    .replace(/<select name=\\?"employee_id\\?"[^]*?<\/select>/g, "<!-- censored employee id -->");
+        console.log(issueTitle);
+        console.log("Stack trace:");
+        console.log(issueStackTrace);
+        //console.log("Event log:");
+        //console.log(issueEventLog);
+        try {
+            if (document.getElementById("session_shop").innerHTML == "Test Store")
+                return;
+        } catch(e) {}
+        reportExceptionAsIssueRequest = GM_xmlhttpRequest({
+            url: "https://api.github.com/repos/gmkarl/lightspeedcatchbarcode/issues",
+            method: "POST",
+            headers: {
+                "User-Agent": "lightspeedcatchbarcode",
+                Accept: "application/vnd.github.v3+json",
+                Authorization: "token be8980229117ea4298" + "497dc0f7f4af73ac24f040",
+                "Content-Type": "application/json"
+            },
+            data: JSON.stringify({
+                title: issueTitle,
+                body: "Stack trace:\n```\n" + issueStackTrace + "\n```" //+ "\nEvent log:\n```\n" + issueEventLog + "\n```"
+            }),
+        });
+    } catch(e) {
+        console.log("exception in exception handler");
+        console.log(e.toString());
+        console.log(e.stack);
+    }
+}
 
 })();
