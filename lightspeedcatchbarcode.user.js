@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Lightspeed Register Barcode Catcher
 // @namespace    https://github.com/gmkarl/lightspeedcatchbarcode/
-// @version      0.1.5
+// @version      0.1.6
 // @description  Handles barcodes entered into the wrong place in the Lightspeed Register.
 // @author       Karl Semich
 // @match        https://*.merchantos.com/register.php*
@@ -41,8 +41,32 @@ function isEAN(digitArray) {
     return sum % 10 == 0;
 }
 
+function isUPCE(d) {
+    if (d.length != 8)
+        return false;
+    if (d[0] != 0 && d[0] != 1)
+        return false;
+
+    var n;
+    if (d[6] < 3)
+        n = [d[0],d[1],d[2],d[6],0,   0,   0,0,d[3],d[4],d[5],d[7]];
+    else if (d[6] == 3)
+        n = [d[0],d[1],d[2],d[3],0,   0,   0,0,0,   d[4],d[5],d[7]];
+    else if (d[6] == 4)
+        n = [d[0],d[1],d[2],d[3],d[4],0,   0,0,0,   0,   d[5],d[7]];
+    else if (d[6] > 4)
+        n = [d[0],d[1],d[2],d[3],d[4],d[5],0,0,0,   0,   d[6],d[7]];
+
+    if (isEAN(n)) {
+        lastKeys = n;
+        return true;
+    } else {
+        return false;
+    }
+}
+
 function isBarcode(digitArray) {
-    return (digitArray.length == 8 || digitArray.length == 12 || digitArray.length == 13) && isEAN(digitArray);
+    return isUPCE(digitArray) || ((digitArray.length == 8 || digitArray.length == 12 || digitArray.length == 13) && isEAN(digitArray));
 }
 
 function doItemSearch(string) {
