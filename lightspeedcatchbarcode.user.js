@@ -83,6 +83,13 @@ function doItemSearch(string) {
 unsafeWindow.onkeydown = cloneInto(function(evt) {
 
     try {
+        var register = document.getElementById("register");
+        if (!register || register.style.display == "none") {
+        
+            lastKeys = [];
+            return true;
+        }
+
         if (isNumeric(evt)) {
     
             if (lastKeys.length == 0) {
